@@ -4,6 +4,12 @@ from models import Book
 app = Flask(__name__)
 books = {}
 
+sample_book_one = Book(book_id=1, title='Internet 101: A guide to browsing the web', author='John W. Doe', published_date='1970-1-1')
+books[1] = sample_book_one
+
+sample_book_two = Book(book_id=2, title='Windows 101: A guide to basic computer usage', author='Jane L. Doe', published_date='1970-1-1')
+books[2] = sample_book_two
+
 
 @app.route('/books', methods=['POST'])
 def post_book():

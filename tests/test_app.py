@@ -4,14 +4,14 @@ from app import app
 
 
 class TestApp(unittest.TestCase):
-    def set_up(self):
+    def setUp(self):
         # Setting up the testing itself
         self.app = app.test_client()
         self.app.testing = True
 
         # Sample data for later use
         self.sample_book = {
-            'book_id': 1,
+            'book_id': 3,
             'title': 'Python 101: Coding Exercises for Beginners',
             'author': 'John W. Doe',
             'published_date': '2024-03-01'
@@ -49,23 +49,24 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     # Testing method for put_book
-    def test_put_book(self):
+    def test_put_book_three(self):
         # Arrange
         updated_book = self.sample_book
         updated_book['author'] = 'John W. Doe, Jane L. Doe'
         data = json.dumps(updated_book)
+        book_id = 3
 
         # Act
-        response = self.app.put('/books/1', data=data, content_type='application/json')
+        response = self.app.put(f'/books/{book_id}', data=data, content_type='application/json')
 
         # Assert
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['author'], 'John W. Doe, Jane L. Doe')
 
     # Testing method for delete_book
-    def test_delete_book_one(self):
+    def test_delete_book_two(self):
         # Arrange
-        book_id = 1
+        book_id = 2
 
         # Act
         response = self.app.delete(f'/books/{book_id}')
