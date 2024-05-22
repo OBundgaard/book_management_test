@@ -26,7 +26,7 @@ def get_book(book_id):
     book = books.get(book_id)
     if book:
         # Return book
-        return jsonify(book.to_dict()), 202
+        return jsonify(book.to_dict())
     else:
         # Return 404
         return jsonify({'message': 'Book not found'}), 404
@@ -35,11 +35,11 @@ def get_book(book_id):
 @app.route('/books', methods=['GET'])
 def get_all_books():
     # Return all the books
-    return jsonify([book.to_dict() for book in books.values()]), 202
+    return jsonify([book.to_dict() for book in books.values()])
 
 
 @app.route('/books/<int:book_id>', methods=['PUT'])
-def update_book(book_id):
+def put_book(book_id):
     # Obtain the data from the request
     data = request.get_json()
     # Find the book by ID
@@ -49,7 +49,7 @@ def update_book(book_id):
         book.title = data['title']
         book.author = data['author']
         book.published_date = data['published_date']
-        return jsonify(book.to_dict()), 202
+        return jsonify(book.to_dict())
     else:
         # Return 404
         return jsonify({'message': 'Book not found'}), 404
@@ -60,7 +60,7 @@ def delete_book(book_id):
     if book_id in books:
         # Delete book
         del books[book_id]
-        return jsonify({'message': 'Book deleted'}), 202
+        return jsonify({'message': 'Book deleted'})
     else:
         # Return 404
         return jsonify({'message': 'Book not found'}), 404
