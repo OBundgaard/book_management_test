@@ -1,11 +1,69 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from models import Book
 
 app = Flask(__name__)
+books = {}
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+@app.route('/books', methods=['POST'])
+def post_book():
+    if request.method == 'POST':
+        # Obtain the data from the request
+        data = request.get_json()
+
+        # Create the book based on the received data
+        book = Book(book_id=data['book_id'], title=data['title'], author=data['author'],
+                    published_date=data['published_date'])
+
+        # Add book and return the book as a dict
+        books[book.book_id] = book
+        return jsonify(book.to_dict()), 201
+
+
+@app.route('/books/<int:book_id>', methods=['GET'])
+def get_book(book_id):
+    # Find the book by ID
+    book = books.get(book_id)
+    if book:
+        # Return book
+        return jsonify(book.to_dict()), 202
+    else:
+        # Return 404
+        return jsonify({'message': 'Book not found'}), 404
+
+
+@app.route('/books', methods=['GET'])
+def get_all_books():
+    # Return all the books
+    return jsonify([book.to_dict() for book in books.values()]), 202
+
+
+@app.route('/books/<int:book_id>', methods=['PUT'])
+def update_book(book_id):
+    # Obtain the data from the request
+    data = request.get_json()
+    # Find the book by ID
+    book = books.get(book_id)
+    if book:
+        # Update book, and return it
+        book.title = data['title']
+        book.author = data['author']
+        book.published_date = data['published_date']
+        return jsonify(book.to_dict()), 202
+    else:
+        # Return 404
+        return jsonify({'message': 'Book not found'}), 404
+
+
+@app.route('/books/<int:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    if book_id in books:
+        # Delete book
+        del books[book_id]
+        return jsonify({'message': 'Book deleted'}), 202
+    else:
+        # Return 404
+        return jsonify({'message': 'Book not found'}), 404
 
 
 if __name__ == '__main__':
