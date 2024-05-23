@@ -13,9 +13,9 @@ class DataTestApp(unittest.TestCase):
         self.app.testing = True
 
     @ddt.data(
-        Book(book_id=2, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
-        Book(book_id=4, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
-        Book(book_id=5, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
+        Book(book_id=7, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
+        Book(book_id=8, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
+        Book(book_id=9, title='Sample book', author='Sample author', published_date='1970-1-1').to_dict(),
     )
     def test_post_books(self, case):
         # Arrange
@@ -28,7 +28,7 @@ class DataTestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json['title'], case['title'])
 
-    @ddt.data(3, 4, 9)
+    @ddt.data(4, 5, 6)
     def test_get_books(self, case):
         # Arrange
         book_id = case
@@ -57,7 +57,7 @@ class DataTestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['author'], 'A python developer')
 
-    @ddt.data(1, 2, 9)
+    @ddt.data(1, 2, 3)
     def test_delete_books(self, case):
         # Arrange
         book_id = case
