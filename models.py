@@ -8,6 +8,11 @@ class Book:
         self.author = author
         self.published_date = published_date
 
+    def __eq__(self, other):
+        if not isinstance(other, Book):
+            return False
+        return (self.book_id, self.title, self.author, self.published_date) == (other.book_id, other.title, other.author, other.published_date)
+
     def to_dict(self):
         return {
             'book_id': self.book_id,

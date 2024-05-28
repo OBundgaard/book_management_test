@@ -1,65 +1,56 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+from models import Book
+from app import get_all_books_from_file, sort_books_from_author
 
-from app import app, books
 
+class MockTestApp(unittest.TestCase):
 
-class TestFlaskApp(unittest.TestCase):
+    # Testing sorting books [SUCCESS EXPECTED]
+    @patch('app.get_all_books_from_file')
+    def test_sort_books_from_author_success(self, mock_get_all_books_from_file):
+        # Arrange
+        mock_get_all_books_from_file.return_value = [
+            Book(2, 'Great Expectations', 'Charles Dickens', '1861'),
+            Book(1, 'A Tale of Two Cities', 'Charles Dickens', '1859'),
+            Book(4, 'Moby Dick', 'Herman Melville', '1851'),
+            Book(3, 'Oliver Twist', 'Charles Dickens', '1837'),
+        ]
 
-    @patch('app.books', {})
-    @patch('app.Book')
-    @patch('flask.request')
-    def test_post_book_already_exists(self, mock_request, MockBook):
-        # Setting up the mock data and behavior
-        mock_request.get_json.return_value = {
-            'book_id': 1,
-            'title': 'New Book',
-            'author': 'New Author',
-            'published_date': '2023-01-01'
-        }
+        expected_books = [
+            Book(1, 'A Tale of Two Cities', 'Charles Dickens', '1859'),
+            Book(2, 'Great Expectations', 'Charles Dickens', '1861'),
+            Book(3, 'Oliver Twist', 'Charles Dickens', '1837'),
+        ]
 
-        books[1] = MockBook(book_id=1, title='Sample Book', author='Sample Author', published_date='1970-1-1')
+        # Act
+        result = sort_books_from_author('Charles Dickens')
 
-        # Creating a test client
-        with app.test_client() as client:
-            response = client.post('/books')
+        # Assert
+        self.assertEqual(result, expected_books)
 
-            # Asserting the response
-            self.assertEqual(response.status_code, 409)
-            self.assertEqual(response.get_json(), {'message': 'Book already exists'})
+    # Testing sorting books [FAIL EXPECTED]
+    @patch('app.get_all_books_from_file')
+    def test_sort_books_from_author_fail(self, mock_get_all_books_from_file):
+        # Arrange
+        mock_get_all_books_from_file.return_value = [
+            Book(2, 'Great Expectations', 'Charles Dickens', '1861'),
+            Book(1, 'A Tale of Two Cities', 'Charles Dickens', '1859'),
+            Book(4, 'Moby Dick', 'Herman Melville', '1851'),
+            Book(3, 'Oliver Twist', 'Charles Dickens', '1837'),
+        ]
 
-    @patch('app.books', {})
-    @patch('app.Book')
-    @patch('flask.request')
-    def test_post_book_success(self, mock_request, MockBook):
-        # Setting up the mock data and behavior
-        mock_request.get_json.return_value = {
-            'book_id': 1,
-            'title': 'New Book',
-            'author': 'New Author',
-            'published_date': '2023-01-01'
-        }
+        expected_books = [
+            Book(1, 'A Tale of Two Cities', 'Charles Dickens', '1859'),
+            Book(2, 'Great Expectations', 'Charles Dickens', '1861'),
+            Book(4, 'Moby Dick', 'Herman Melville', '1851'),
+        ]
 
-        mock_book_instance = MagicMock()
-        mock_book_instance.to_dict.return_value = {
-            'book_id': 1,
-            'title': 'New Book',
-            'author': 'New Author',
-            'published_date': '2023-01-01'
-        }
-        MockBook.return_value = mock_book_instance
+        # Act
+        result = sort_books_from_author('Charles Dickens')
 
-        # Creating a test client
-        with app.test_client() as client:
-            response = client.post('/books')
-
-            # Asserting the response
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.get_json(), mock_book_instance.to_dict())
-            MockBook.assert_called_once_with(book_id=1, title='New Book', author='New Author',
-                                             published_date='2023-01-01')
-            self.assertIn(1, books)
-            self.assertEqual(books[1], mock_book_instance)
+        # Assert
+        self.assertNotEqual(result, expected_books)
 
 
 if __name__ == '__main__':

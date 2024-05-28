@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, jsonify
 from models import Book
 
@@ -80,6 +82,32 @@ def delete_book(book_id):
     else:
         # Return 404
         return jsonify({'message': 'Book not found'}), 404
+
+
+# == == == == == == == == == == == == == == == == == == == == ==
+
+
+def get_all_books_from_file() -> list[Book]:
+    _books = []
+    try:
+        with open('books.json') as file:
+            data = json.load(file)
+            for book in data:
+                _books.append(Book(book['id'], book['title'], book['author'], book['published_date']))
+    except FileNotFoundError:
+        return []
+
+    return _books
+
+
+def sort_books_from_author(author: str) -> list[Book]:
+    # Only grab books from one author
+    _books = [book for book in get_all_books_from_file() if book.author == author]
+
+    # Sort books by title
+    sorted_books = sorted(_books, key=lambda book: book.title, reverse=False)
+
+    return sorted_books
 
 
 if __name__ == '__main__':
